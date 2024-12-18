@@ -1,28 +1,15 @@
 pipeline {
-    agent any
-
-    tools {
-        maven 'maven'
-        jdk 'jdk'
-    }
-
+    agent { label 'hoofdnode' }
     stages {
-        stage('Build') {
+        stage('Check Environment') {
             steps {
-                sh 'mvn clean install -DskipTests'
+                sh '''
+                    echo "Hostname: $(hostname)"
+                    echo "Working Directory: $(pwd)"
+                    echo "Who am I: $(whoami)"
+                    echo "Path: $PATH"
+                '''
             }
-        }
-        stage('Test-Stage') {
-            steps {
-                sh 'mvn -Dmaven.test.failure.ignore=true test'
-            }
-        }
-    }
-
-    post {
-        always {
-            publishCoverage adapters: [jacocoAdapter('**/target/site/jacoco/jacoco.xml')]
-            junit '**/target/surefire-reports/*.xml'
         }
     }
 }
